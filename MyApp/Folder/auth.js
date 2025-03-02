@@ -14,6 +14,17 @@ export const login = async (email, password) => {
   }
 };
 
+export const signup = async (email, password) => {
+  try {
+    const response = await axios.post(`${API_URL}/signup`, { email, password });
+    const token = response.data.token;
+    await AsyncStorage.setItem("token", token);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Signup failed");
+  }
+};
+
 export const logout = async () => {
   await AsyncStorage.removeItem("token");
 };
