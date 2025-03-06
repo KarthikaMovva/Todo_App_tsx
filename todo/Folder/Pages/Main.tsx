@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, FlatList, Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../Navigation/AppNavigation"; // Import stack type
+import { RootStackParamList } from "../Navigation/AppNavigation";
 
 const API_URL = "http://localhost:5000/api/todos";
 
@@ -27,49 +26,17 @@ interface Todo {
 
 const Main: React.FC<MainProps> = ({ navigation }) => {
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const token = await AsyncStorage.getItem("token");
-        if (token) {
-          const tokenParts = token.split(".");
-          if (tokenParts.length === 3) {
-            const decodedToken = JSON.parse(atob(tokenParts[1]));
-            setUserId(decodedToken.userId);
-          } else {
-            console.error("Invalid token format.");
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching userId:", error);
-      }
-    };
-
-    fetchUserId();
-  }, []);
-
-  useEffect(() => {
-    if (userId) {
       fetchTodos();
-    }
-  }, [userId]);
+  }, []);
 
   const fetchTodos = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        console.error("No token found.");
-        return;
-      }
 
-      const response = await axios.get<Todo[]>(API_URL, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const userTodos = response.data.filter((todo) => todo.userId === userId);
-      setTodos(userTodos);
+      const response = await axios.get<Todo[]>(API_URL);
+     console.log(response)
+    //   setTodos(userTodos);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -77,15 +44,8 @@ const Main: React.FC<MainProps> = ({ navigation }) => {
 
   const deleteTodo = async (id: string) => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        console.error("No token found.");
-        return;
-      }
 
-      await axios.delete(`${API_URL}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(`${API_URL}/${id}`);
 
       Alert.alert("Deleted", "Task removed successfully.");
       fetchTodos();
