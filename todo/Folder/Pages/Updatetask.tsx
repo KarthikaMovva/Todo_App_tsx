@@ -42,9 +42,13 @@ const Updatetask: React.FC<UpdateTaskProps> = ({ route, navigation }) => {
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
       console.log(res,"update task res")
+      console.log('Updating todo:', todo._id, { title, completed });
+
     } catch (error) {
       console.error("Error updating task:", error);
       Alert.alert("Error", "Failed to update task. Try again!");
+      console.log('Updating todo:', todo._id, { title, completed });
+
     }
   };
 

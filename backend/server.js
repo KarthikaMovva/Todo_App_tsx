@@ -8,7 +8,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
 app.use("/api/todos", todoRoutes);
 
 mongoose
@@ -17,4 +16,5 @@ mongoose
   .catch((err) => console.log(err));
 
 const PORT = process.env.PORT;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT,"0.0.0.0", () => console.log("Server running on port 5000"));
+

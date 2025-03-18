@@ -5,9 +5,8 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../Navigation/AppNavigation";
 
-const API_URL = "http://localhost:5000/api/todos";
+const API_URL = "http://localhost:5000/api/todos"; // remove extra tab
 
-// Define navigation and route props
 type MainScreenNavigationProp = StackNavigationProp<RootStackParamList, "Main">;
 type MainScreenRouteProp = RouteProp<RootStackParamList, "Main">;
 
@@ -16,27 +15,25 @@ interface MainProps {
   route: MainScreenRouteProp;
 }
 
-// Define Todo type
 interface Todo {
   _id: string;
   title: string;
   completed: boolean;
-  userId: string;
 }
 
 const Main: React.FC<MainProps> = ({ navigation }) => {
   const [todos, setTodos] = useState<Todo[]>([]);
 
   useEffect(() => {
-      fetchTodos();
-  }, []);
+    const unsubscribe = navigation.addListener("focus", fetchTodos);
+    return unsubscribe;
+  }, [navigation]);
 
   const fetchTodos = async () => {
     try {
-
       const response = await axios.get<Todo[]>(API_URL);
-     console.log(response)
-    //   setTodos(userTodos);
+      setTodos(response.data);
+      console.log(response);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -44,9 +41,7 @@ const Main: React.FC<MainProps> = ({ navigation }) => {
 
   const deleteTodo = async (id: string) => {
     try {
-
       await axios.delete(`${API_URL}/${id}`);
-
       Alert.alert("Deleted", "Task removed successfully.");
       fetchTodos();
     } catch (error) {
@@ -57,7 +52,7 @@ const Main: React.FC<MainProps> = ({ navigation }) => {
   return (
     <View style={{ padding: 20 }}>
       <Button title="Add Todo" onPress={() => navigation.navigate("Addtask")} />
-      <Button title="Update Todo" onPress={() => navigation.navigate("Updatetask")} />
+
       <FlatList
         data={todos}
         keyExtractor={(item) => item._id}
@@ -68,12 +63,21 @@ const Main: React.FC<MainProps> = ({ navigation }) => {
               justifyContent: "space-between",
               padding: 10,
               borderBottomWidth: 1,
+              alignItems: "center",
             }}
           >
-            <Text>
-              {item.title} {item.completed ? "✅" : "❌"}
-            </Text>
-            <Button title="Delete" color="red" onPress={() => deleteTodo(item._id)} />
+            <View>
+              <Text>
+                {item.title} {item.completed ? "✅" : "❌"}
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", gap: 5 }}>
+              <Button
+                title="Update"
+                onPress={() => navigation.navigate("Updatetask", { todo: item })}
+              />
+              <Button title="Delete" color="red" onPress={() => deleteTodo(item._id)} />
+            </View>
           </View>
         )}
       />
