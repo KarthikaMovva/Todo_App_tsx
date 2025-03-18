@@ -4,11 +4,17 @@ import Main from "../Pages/Main";
 import Addtask from "../Pages/Addtask";
 import Updatetask from "../Pages/Updatetask";
 
+export interface Todo {
+  _id: string;
+  title: string;
+  completed: boolean;
+}
+
 export type RootStackParamList = {
   Login: undefined;
   Main: undefined;
   Addtask: undefined;
-  Updatetask: undefined;
+  Updatetask: { todo: Todo };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
